@@ -1,0 +1,9 @@
+name: customer
+openshift_version: "4.18.1"
+machine_pools:
+  - name: workers
+    openshift_version: "4.18.1"
+
+auto_patch: true
+
+# This cluster yaml file should be automerged
