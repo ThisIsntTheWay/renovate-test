@@ -1,0 +1,14 @@
+name: Dummy Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  dummy:
+    runs-on: ubuntu-latest
+    steps:
+        - name: You are winner
+          run: exit 0
