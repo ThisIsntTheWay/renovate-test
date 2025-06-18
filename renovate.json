@@ -24,8 +24,15 @@
       "matchDatasources": [
         "custom.rosa_available_machine_pool_upgrades"
       ],
-      "groupName": "openshift machine pools {{ lookup (split depName '/') 0 }}",
-      "commitMessageTopic": "cluster machine pools for {{ lookup (split depName '/') 0 }}"
+      "groupName": "openshift machine pools {{ lookup (split packageName '/') 0 }}",
+      "commitMessageTopic": "cluster machine pools for {{ lookup (split packageName '/') 0 }}"
+    },
+    {
+      "matchDatasources": [
+      "custom.rosa_available_upgrades"
+      ],
+      "groupName": "openshift controlplane {{ packageName }}",
+      "commitMessageTopic": "cluster controlplane for {{ packageName }}"
     },
     {
       "matchDatasources": [
@@ -35,20 +42,12 @@
       "matchUpdateTypes": [
         "patch"
       ],
-      "matchUpdatePatterns": [
-        "^\\d+\\.\\d+\\.\\d+$"
+      "matchDepNames": [ 
+        "autoPatch"
       ],
-      "groupName": "openshift machine pools {{ lookup (split depName '/') 0 }}",
-      "commitMessageTopic": "cluster machine pools for {{ lookup (split depName '/') 0 }}",
-      "automerge": true,
-      "dependencyDashboardApproval": false
-    },
-    {
-      "matchDatasources": [
-      "custom.rosa_available_upgrades"
-      ],
-      "groupName": "openshift controlplane {{ depName }}",
-      "commitMessageTopic": "cluster controlplane for {{ depName }}"
+      "groupName": "openshift machine pools {{ lookup (split packageName '/') 0 }}",
+      "commitMessageTopic": "cluster machine pools for {{ lookup (split packageName '/') 0 }}",
+      "automerge": true
     }
   ],
   "customManagers": [
@@ -60,7 +59,7 @@
       ],
       "fileFormat": "yaml",
       "matchStrings": [
-        "{\"currentValue\": openshift_version, \"packageName\": name}"
+        "[{\"currentValue\": openshift_version, \"packageName\": name, \"depName\": $exists(auto_patch) and auto_patch = true ? \"autoPatch\" : name}]"
       ],
       "datasourceTemplate": "custom.rosa_available_upgrades",
       "versioningTemplate": "semver"
@@ -73,20 +72,7 @@
       ],
       "fileFormat": "yaml",
       "matchStrings": [
-        "[machine_pools[$exists(openshift_version)].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name}]"
-      ],
-      "datasourceTemplate": "custom.rosa_available_machine_pool_upgrades",
-      "versioningTemplate": "semver"
-    },
-    {
-      "customType": "jsonata",
-      "description": "Update Openshift machine pools in cluster yaml files (auto_patch: true)",
-      "managerFilePatterns": [
-      "/clusters/.+\\.ya?ml$/"
-      ],
-      "fileFormat": "yaml",
-      "matchStrings": [
-      "[machine_pools[$exists(openshift_version) and auto_patch=true].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name}]"
+        "[machine_pools[$exists(openshift_version)].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name, \"depName\": $exists(auto_patch) and auto_patch = true ? \"autoPatch\" : name}]"
       ],
       "datasourceTemplate": "custom.rosa_available_machine_pool_upgrades",
       "versioningTemplate": "semver"
