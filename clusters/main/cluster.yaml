@@ -2,6 +2,6 @@ name: main
 openshift_version: "4.18.1"
 machine_pools:
   - name: workers
-    openshift_version: "4.18.1"
+    openshift_version: "4.18.16"
 
 # This cluster yaml file should NOT be automerged
