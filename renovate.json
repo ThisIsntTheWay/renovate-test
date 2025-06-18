@@ -96,7 +96,7 @@
       "format": "json",
       "defaultRegistryUrlTemplate": "https://raw.githubusercontent.com/ThisIsntTheWay/renovate-test/refs/heads/main/updates.json",
       "transformTemplates": [
-        "{\"releases\": [$lookup($lookup(rosa_available_machine_pool_upgrades, $split(\"{{packageName}}\", \"/\")[0]), $split(\"{{packageName}}\", \"/\")[1]){\"version\": $sort($)[-1]}]}"
+        "{\"releases\": [$lookup($lookup(rosa_available_machine_pool_upgrades, $split(\"{{packageName}}\", \"/\")[0]), $split(\"{{packageName}}\", \"/\")[1]){\"version\": $[-1]}]}"
       ]
     }
   }
