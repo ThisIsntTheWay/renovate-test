@@ -19,6 +19,8 @@
     "enabled": true,
     "automerge": true
   },
+
+
   "packageRules": [
     {
       "matchDatasources": [
@@ -34,6 +36,8 @@
       "groupName": "openshift controlplane {{ packageName }}",
       "commitMessageTopic": "cluster controlplane for {{ packageName }}"
     },
+
+
     {
       "matchDatasources": [
         "custom.rosa_available_machine_pool_upgrades"
@@ -50,6 +54,8 @@
       "automerge": true
     }
   ],
+
+
   "customManagers": [
     {
       "customType": "jsonata",
@@ -59,7 +65,7 @@
       ],
       "fileFormat": "yaml",
       "matchStrings": [
-        "[{\"currentValue\": openshift_version, \"packageName\": name, \"depName\": $exists(auto_patch) and auto_patch = true ? \"autoPatch\" : name}]"
+        "{ \"currentValue\": openshift_version, \"packageName\": name, \"depName\": auto_patch = true ? \"autoPatch\" : \"noAutoPatch\" }"
       ],
       "datasourceTemplate": "custom.rosa_available_upgrades",
       "versioningTemplate": "semver"
@@ -72,7 +78,7 @@
       ],
       "fileFormat": "yaml",
       "matchStrings": [
-        "[machine_pools[$exists(openshift_version)].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name, \"depName\": $exists(auto_patch) and auto_patch = true ? \"autoPatch\" : name}]"
+        "machine_pools[$exists(openshift_version)].{ \"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name, \"depName\": $$.auto_patch = true ? \"autoPatch\" : \"noAutoPatch\" }"
       ],
       "datasourceTemplate": "custom.rosa_available_machine_pool_upgrades",
       "versioningTemplate": "semver"
