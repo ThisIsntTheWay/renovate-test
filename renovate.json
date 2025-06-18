@@ -1,0 +1,111 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "group:githubArtifactActions",
+    ":dependencyDashboard"
+  ],
+  "baseBranches": [
+    "main"
+  ],
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "labels": [
+    "renovate"
+  ],
+  "separateMinorPatch": true,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "custom.rosa_available_machine_pool_upgrades"
+      ],
+      "groupName": "openshift machine pools {{ lookup (split depName '/') 0 }}",
+      "commitMessageTopic": "cluster machine pools for {{ lookup (split depName '/') 0 }}"
+    },
+    {
+      "matchDatasources": [
+        "custom.rosa_available_machine_pool_upgrades"
+      ],
+      "description": "Auto update patch version of machine pool",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchUpdatePatterns": [
+        "^\\d+\\.\\d+\\.\\d+$"
+      ],
+      "groupName": "openshift machine pools {{ lookup (split depName '/') 0 }}",
+      "commitMessageTopic": "cluster machine pools for {{ lookup (split depName '/') 0 }}",
+      "automerge": true,
+      "dependencyDashboardApproval": false
+    },
+    {
+      "matchDatasources": [
+      "custom.rosa_available_upgrades"
+      ],
+      "groupName": "openshift controlplane {{ depName }}",
+      "commitMessageTopic": "cluster controlplane for {{ depName }}"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "jsonata",
+      "description": "Update Openshift control plane in cluster yaml files",
+      "managerFilePatterns": [
+        "/clusters/.+\\.yaml$/"
+      ],
+      "fileFormat": "yaml",
+      "matchStrings": [
+        "{\"currentValue\": openshift_version, \"packageName\": name}"
+      ],
+      "datasourceTemplate": "custom.rosa_available_upgrades",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "jsonata",
+      "description": "Update Openshift machine pools in cluster yaml files",
+      "managerFilePatterns": [
+        "/clusters/.+\\.ya?ml$/"
+      ],
+      "fileFormat": "yaml",
+      "matchStrings": [
+        "[machine_pools[$exists(openshift_version)].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name}]"
+      ],
+      "datasourceTemplate": "custom.rosa_available_machine_pool_upgrades",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "jsonata",
+      "description": "Update Openshift machine pools in cluster yaml files (auto_patch: true)",
+      "managerFilePatterns": [
+      "/clusters/.+\\.ya?ml$/"
+      ],
+      "fileFormat": "yaml",
+      "matchStrings": [
+      "[machine_pools[$exists(openshift_version) and auto_patch=true].{\"currentValue\": openshift_version, \"packageName\": $$.name&\"/\"&name}]"
+      ],
+      "datasourceTemplate": "custom.rosa_available_machine_pool_upgrades",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "customDatasources": {
+    "rosa_available_upgrades": {
+      "format": "json",
+      "defaultRegistryUrlTemplate": "https://raw.githubusercontent.com/ThisIsntTheWay/renovate-test/refs/heads/main/updates.json",
+      "transformTemplates": [
+        "{\"releases\":[rosa_available_upgrades.\"{{packageName}}\".{\"version\": $}]}"
+      ]
+    },
+    "rosa_available_machine_pool_upgrades": {
+      "format": "json",
+      "defaultRegistryUrlTemplate": "https://raw.githubusercontent.com/ThisIsntTheWay/renovate-test/refs/heads/main/updates.json",
+      "transformTemplates": [
+        "{\"releases\": [$lookup($lookup(rosa_available_machine_pool_upgrades, $split(\"{{packageName}}\", \"/\")[0]), $split(\"{{packageName}}\", \"/\")[1]){\"version\": $}]}"
+      ]
+    }
+  }
+}
