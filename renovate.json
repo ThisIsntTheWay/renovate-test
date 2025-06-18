@@ -52,6 +52,21 @@
       "groupName": "openshift machine pools {{ lookup (split packageName '/') 0 }}",
       "commitMessageTopic": "cluster machine pools for {{ lookup (split packageName '/') 0 }}",
       "automerge": true
+    },
+    {
+      "matchDatasources": [
+        "custom.rosa_available_upgrades"
+      ],
+      "description": "Auto update patch version of control planes",
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchDepNames": [ 
+        "autoPatch"
+      ],
+      "groupName": "openshift controlplane {{ packageName }}",
+      "commitMessageTopic": "cluster controlplane for {{ packageName }}",
+      "automerge": true
     }
   ],
 
